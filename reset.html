@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite League - Reset Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 12px 20px;
+            margin: 10px 5px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #ff7aa2;
+            color: white;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #ff5580;
+        }
+        .danger {
+            background: #e74c3c;
+        }
+        .danger:hover {
+            background: #c0392b;
+        }
+        .success {
+            background: #27ae60;
+        }
+        .success:hover {
+            background: #229954;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .status.success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        .status.error {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Elite League - Data Reset</h1>
+        
+        <p>Use these options to reset your Elite League data:</p>
+        
+        <button class="danger" onclick="clearAllData()">🗑️ Clear ALL Data</button>
+        <button class="success" onclick="resetFixtures()">🔄 Reset & Regenerate Fixtures</button>
+        <button onclick="goBack()">← Back to League</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function clearAllData() {
+            if (confirm('⚠️ This will delete ALL data (players, fixtures, results). Continue?')) {
+                localStorage.removeItem('eliteLeagueState');
+                showStatus('✅ All data cleared. Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'elite.html';
+                }, 1500);
+            }
+        }
+
+        function resetFixtures() {
+            if (confirm('This will regenerate fixtures (keeping players & results). Continue?')) {
+                try {
+                    const existingState = JSON.parse(localStorage.getItem('eliteLeagueState')) || {};
+                    
+                    // Generate fresh fixtures
+                    const fixtures = [];
+                    let fixtureId = 1;
+                    
+                    for (let week = 1; week <= 7; week++) {
+                        for (let i = 0; i < 4; i++) {
+                            const home = ((i + week - 1) % 8) + 1;
+                            const away = (((7 - i) + week - 1) % 8) + 1;
+                            
+                            if (home !== away) {
+                                fixtures.push({
+                                    id: fixtureId++,
+                                    week: week,
+                                    homeTeamId: home,
+                                    awayTeamId: away,
+                                    homeScore: null,
+                                    awayScore: null,
+                                    scorers: [],
+                                    assisters: [],
+                                    played: false
+                                });
+                            }
+                        }
+                    }
+                    
+                    const firstRound = fixtures.slice();
+                    for (let week = 8; week <= 14; week++) {
+                        const weekIndex = week - 8;
+                        const matchesThisWeek = firstRound.filter(f => f.week === weekIndex + 1);
+                        
+                        matchesThisWeek.forEach(match => {
+                            fixtures.push({
+                                id: fixtureId++,
+                                week: week,
+                                homeTeamId: match.awayTeamId,
+                                awayTeamId: match.homeTeamId,
+                                homeScore: null,
+                                awayScore: null,
+                                scorers: [],
+                                assisters: [],
+                                played: false
+                            });
+                        });
+                    }
+                    
+                    const newState = {
+                        teams: existingState.teams || Array.from({length: 8}, (_, i) => ({id: i+1, name: `Team ${i+1}`, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0})),
+                        players: existingState.players || [],
+                        fixtures: fixtures,
+                        knockoutFixtures: existingState.knockoutFixtures || [],
+                        disciplinary: existingState.disciplinary || [],
+                        registrationRevenue: existingState.registrationRevenue || 0,
+                        disciplinaryRevenue: existingState.disciplinaryRevenue || 0,
+                        potw: existingState.potw || 'TBD',
+                        accountNumber: existingState.accountNumber || '0123456789',
+                        accountName: existingState.accountName || 'Elite League',
+                        adminPassword: existingState.adminPassword || 'admin123'
+                    };
+                    
+                    localStorage.setItem('eliteLeagueState', JSON.stringify(newState));
+                    showStatus(`✅ Fixtures regenerated! (${fixtures.length} total). Redirecting...`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'elite.html';
+                    }, 1500);
+                } catch (e) {
+                    showStatus('❌ Error: ' + e.message, 'error');
+                }
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'elite.html';
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+        }
+
+        // Show current data on load
+        window.addEventListener('load', () => {
+            const state = JSON.parse(localStorage.getItem('eliteLeagueState'));
+            if (state) {
+                showStatus(`Current Data: ${state.players.length} players, ${state.fixtures.length} fixtures, Password: ${state.adminPassword}`, 'info');
+            } else {
+                showStatus('No data found in localStorage', 'info');
+            }
+        });
+    </script>
+</body>
+</html>

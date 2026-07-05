@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>200L Football League</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="hero">
+        <div>
+            <p class="eyebrow">200 Level Football League</p>
+            <h1>Elite League Dashboard</h1>
+        </div>
+        <div class="hero-meta">
+            <div class="info-card">
+                <h2>Transfer Account</h2>
+                <p id="account-display">Transfer fees to: 2084462297 (Kuda-Marcel Prosper Somtochukwu)</p>
+            </div>
+            <div class="info-card">
+                <h2>League Balance</h2>
+                <p id="header-balance">₦0</p>
+            </div>
+            <div class="info-card">
+                <h2>Player of the Week</h2>
+                <p id="potw-display">TBD</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="panel admin-panel">
+            <h2>Admin Access</h2>
+            <div id="admin-login-block">
+                <input type="password" id="admin-pass" placeholder="Admin password">
+                <button id="admin-login-btn" type="button">Unlock Admin</button>
+            </div>
+            <div id="admin-controls" hidden>
+                <form id="player-form" class="inline-form">
+                    <input id="player-name" type="text" placeholder="Player name" required>
+                    <label class="checkbox-row"><input id="paid-fee" type="checkbox"> Paid 3,000 entry fee</label>
+                    <button type="submit">Register Player</button>
+                </form>
+
+                <form id="potw-form" class="inline-form">
+                    <select id="potw-player"></select>
+                    <button type="submit">Set Player of the Week</button>
+                </form>
+
+                <form id="team-rename-form" class="inline-form">
+                    <select id="team-rename-select"></select>
+                    <input id="team-new-name" type="text" placeholder="New team name" required>
+                    <button type="submit">Rename Team</button>
+                </form>
+
+                <button id="generate-fixtures-btn" type="button">Create / Refresh Fixtures</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>League Rules</h2>
+            <ul class="rules-list">
+                <li>Every registered player must pay the 3,000 entry fee to join the league.</li>
+                <li>Paid players are assigned to a random team with a maximum of 10 players per team.</li>
+                <li>Yellow cards cost 500 and red cards cost 1,000.</li>
+                <li>Players with 2 yellow cards or 1 red card are suspended for the next match and will pay fines for both yellow card and red card.</li>
+                <li>Fighting of any such incidents will result in additional disciplinary action(3k fine for each offender).</li>
+                <li>Fine for foul language on referee or any official: 1,000</li>
+            </ul>
+        </section>
+
+        <section class="panel">
+            <h2>League Table</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Team</th>
+                        <th>P</th>
+                        <th>W</th>
+                        <th>D</th>
+                        <th>L</th>
+                        <th>GF</th>
+                        <th>GA</th>
+                        <th>GD</th>
+                        <th>Pts</th>
+                    </tr>
+                </thead>
+                <tbody id="league-table"></tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <div class="two-columns">
+                <div>
+                    <h2>Team Rosters</h2>
+                    <div id="team-list" class="team-grid"></div>
+                </div>
+                <div>
+                    <h2>Top Goal Scorers</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Player</th><th>Goals</th></tr>
+                        </thead>
+                        <tbody id="scorers-table"></tbody>
+                    </table>
+
+                    <h2>Top Assist King</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Player</th><th>Assists</th></tr>
+                        </thead>
+                        <tbody id="assists-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Disciplinary Records</h2>
+            <form id="card-form" class="inline-form">
+                <select id="card-player"></select>
+                <select id="card-type">
+                    <option value="yellow">Yellow Card (500)</option>
+                    <option value="red">Red Card (1000)</option>
+                </select>
+                <button type="submit">Record Card</button>
+            </form>
+            <table>
+                <thead>
+                    <tr><th>Player</th><th>Card</th><th>Fee</th><th>Status</th></tr>
+                </thead>
+                <tbody id="disciplinary-table"></tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <h2>Fixtures and Results</h2>
+            <div class="fixture-filter">
+                <label for="week-select">Choose Week:</label>
+                <select id="week-select"></select>
+            </div>
+            <div class="fixture-table-wrapper">
+                <table class="fixtures-table">
+                    <thead>
+                        <tr>
+                            <th>Fixture</th>
+                            <th>Score</th>
+                            <th>Scorers</th>
+                            <th>Assists</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="fixtures-list"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel" id="knockout-section" style="display: none;">
+            <h2>Knockout Rounds (Top 6)</h2>
+            <div class="fixture-table-wrapper">
+                <table class="fixtures-table">
+                    <thead>
+                        <tr>
+                            <th>Round</th>
+                            <th>Matchup</th>
+                            <th>Score</th>
+                            <th>Scorers</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="knockout-list"></tbody>
+                </table>
+            </div>
+        </section>
+            <div class="revenue-stats">
+                <div class="stat-item">
+                    <h4>Registration Revenue</h4>
+                    <p id="analytics-registration">₦0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Disciplinary Revenue</h4>
+                    <p id="analytics-disciplinary">₦0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Total Revenue</h4>
+                    <p id="analytics-total">₦0</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Finance</h2>
+            <div class="finance-grid">
+                <div class="info-card">
+                    <h3>Registration Fee</h3>
+                    <p id="registration-revenue">0</p>
+                </div>
+                <div class="info-card">
+                    <h3>Disciplinary Fees</h3>
+                    <p id="disciplinary-revenue">0</p>
+                </div>
+                <div class="info-card">
+                    <h3>League Balance</h3>
+                    <p id="league-balance">0</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Player Profile Modal -->
+    <div id="player-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="modal-player-name"></h2>
+            <div id="modal-player-details"></div>
+        </div>
+    </div>
+
+    <script src="setup-fixtures.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
